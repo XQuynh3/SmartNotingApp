@@ -1,0 +1,22 @@
+[
+    {
+        "merged": "com.example.notingapp-merged_res-47:/layout_item_note.xml.flat",
+        "source": "com.example.notingapp-main-49:/layout/item_note.xml"
+    },
+    {
+        "merged": "com.example.notingapp-merged_res-47:/layout_activity_map.xml.flat",
+        "source": "com.example.notingapp-main-49:/layout/activity_map.xml"
+    },
+    {
+        "merged": "com.example.notingapp-merged_res-47:/layout_activity_main.xml.flat",
+        "source": "com.example.notingapp-main-49:/layout/activity_main.xml"
+    },
+    {
+        "merged": "com.example.notingapp-merged_res-47:/layout_fragment_home.xml.flat",
+        "source": "com.example.notingapp-main-49:/layout/fragment_home.xml"
+    },
+    {
+        "merged": "com.example.notingapp-merged_res-47:/layout_activity_create_note.xml.flat",
+        "source": "com.example.notingapp-main-49:/layout/activity_create_note.xml"
+    }
+]
