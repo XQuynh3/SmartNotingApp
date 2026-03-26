@@ -48,6 +48,8 @@ class CreateNoteActivity : AppCompatActivity() {
 
     private var currentNote: Note? = null
 
+    private var pendingGeofenceNote: Note? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
@@ -189,40 +191,77 @@ class CreateNoteActivity : AppCompatActivity() {
 
     private fun deleteCurrentTag() {}
 
-    // 🔥 CHECK PERMISSION
+    // 🔥 chỉ cần fine location
     private fun hasLocationPermission(): Boolean {
-        val fine = ActivityCompat.checkSelfPermission(
+        return ActivityCompat.checkSelfPermission(
             this,
             Manifest.permission.ACCESS_FINE_LOCATION
         ) == PackageManager.PERMISSION_GRANTED
-
-        val background =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                ActivityCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.ACCESS_BACKGROUND_LOCATION
-                ) == PackageManager.PERMISSION_GRANTED
-            } else true
-
-        return fine && background
     }
 
     private fun requestLocationPermission() {
-        val permissions = mutableListOf(
-            Manifest.permission.ACCESS_FINE_LOCATION
-        )
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            permissions.add(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+        if (!ActivityCompat.shouldShowRequestPermissionRationale(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            )
+        ) {
+            showPermissionSettingsDialog()
+            return
         }
 
         ActivityCompat.requestPermissions(
             this,
-            permissions.toTypedArray(),
+            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
             999
         )
     }
 
+    private fun showPermissionSettingsDialog() {
+
+        AlertDialog.Builder(this)
+            .setTitle("Cần cấp quyền vị trí")
+            .setMessage("Bạn đã từ chối quyền. Hãy vào Cài đặt để cấp quyền cho app.")
+            .setPositiveButton("Mở cài đặt") { _, _ ->
+
+                val intent = Intent(
+                    android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+                )
+
+                val uri = android.net.Uri.fromParts("package", packageName, null)
+                intent.data = uri
+
+                startActivity(intent)
+            }
+            .setNegativeButton("Hủy", null)
+            .show()
+    }
+
+    private fun addGeofence(note: Note) {
+        try {
+            val geofenceHelper = GeofenceHelper(this)
+
+            val geofence = geofenceHelper.getGeofence(
+                note.id.toString(),
+                note.latitude!!,
+                note.longitude!!
+            )
+
+            val request = geofenceHelper.getGeofencingRequest(geofence)
+
+            val client = LocationServices.getGeofencingClient(this)
+
+            client.addGeofences(
+                request,
+                geofenceHelper.getPendingIntent()
+            )
+
+        } catch (e: SecurityException) {
+            e.printStackTrace()
+        }
+    }
+
+    // 🔥 FIX LOGIC SAVE
     private fun saveNote() {
 
         val note = Note(
@@ -236,44 +275,93 @@ class CreateNoteActivity : AppCompatActivity() {
             locationName = locationName
         )
 
-        if (noteId == -1) {
-            noteViewModel.insert(note)
-        } else {
+        val isEdit = noteId != -1
+
+        // ✅ CASE 1: không có location
+        if (latitude == null || longitude == null) {
+
+            if (isEdit) {
+                noteViewModel.update(note)
+            } else {
+                noteViewModel.insert(note)
+            }
+
+            Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show()
+            finish()
+            return
+        }
+
+        // ✅ CASE 2: có location nhưng chưa có permission
+        if (!hasLocationPermission()) {
+            pendingGeofenceNote = note
+            requestLocationPermission()
+            return
+        }
+
+        // ✅ CASE 3: có location + có permission
+        if (isEdit) {
             noteViewModel.update(note)
+        } else {
+            noteViewModel.insert(note)
         }
 
-        if (latitude != null && longitude != null) {
-
-            if (!hasLocationPermission()) {
-                requestLocationPermission()
-                Toast.makeText(this, "Cần cấp quyền location", Toast.LENGTH_SHORT).show()
-                return
-            }
-
-            try {
-                val geofenceHelper = GeofenceHelper(this)
-
-                val geofence = geofenceHelper.getGeofence(
-                    note.id.toString(),
-                    latitude!!,
-                    longitude!!
-                )
-
-                val request = geofenceHelper.getGeofencingRequest(geofence)
-
-                val client = LocationServices.getGeofencingClient(this)
-
-                client.addGeofences(
-                    request,
-                    geofenceHelper.getPendingIntent()
-                )
-
-            } catch (e: SecurityException) {
-                e.printStackTrace()
-            }
-        }
+        addGeofence(note)
 
         Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show()
         finish()
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        if (requestCode == 999) {
+
+            if (grantResults.isNotEmpty() &&
+                grantResults[0] == PackageManager.PERMISSION_GRANTED
+            ) {
+
+                pendingGeofenceNote?.let { note ->
+
+                    val isEdit = note.id != 0
+
+                    if (isEdit) {
+                        noteViewModel.update(note)
+                    } else {
+                        noteViewModel.insert(note)
+                    }
+
+                    addGeofence(note)
+
+                    Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show()
+                    finish()
+                }
+
+            } else {
+                // 🔥 DENY → save KHÔNG location
+                pendingGeofenceNote?.let { note ->
+
+                    val noteWithoutLocation = note.copy(
+                        latitude = null,
+                        longitude = null,
+                        locationName = null
+                    )
+
+                    val isEdit = noteWithoutLocation.id != 0
+
+                    if (isEdit) {
+                        noteViewModel.update(noteWithoutLocation)
+                    } else {
+                        noteViewModel.insert(noteWithoutLocation)
+                    }
+
+                    Toast.makeText(this, "Saved without location", Toast.LENGTH_SHORT).show()
+                    finish()
+                }
+            }
+        }
     }
 }

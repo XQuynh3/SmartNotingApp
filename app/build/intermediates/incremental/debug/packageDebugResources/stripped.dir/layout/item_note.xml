@@ -50,6 +50,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 
+        <!-- 🔥 NEW: LOCATION -->
+        <TextView
+            android:id="@+id/locationText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="📍 Location"
+            android:textColor="#888888"
+            android:textSize="12sp"/>
+
         <TextView
             android:id="@+id/time"
             android:textColor="#555555"

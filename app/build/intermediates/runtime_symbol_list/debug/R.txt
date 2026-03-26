@@ -3307,6 +3307,7 @@ int id linear 0x7f0800e5
 int id listMode 0x7f0800e6
 int id list_item 0x7f0800e7
 int id locationBtn 0x7f0800e8
+int id locationText 0x7f0801e7
 int id m3_side_sheet 0x7f0800e9
 int id map 0x7f0800ea
 int id marquee 0x7f0800eb

@@ -33,6 +33,9 @@ public final class ItemNoteBinding implements ViewBinding {
   public final LinearLayout deleteLayout;
 
   @NonNull
+  public final TextView locationText;
+
+  @NonNull
   public final TextView tag;
 
   @NonNull
@@ -43,13 +46,14 @@ public final class ItemNoteBinding implements ViewBinding {
 
   private ItemNoteBinding(@NonNull FrameLayout rootView, @NonNull TextView content,
       @NonNull LinearLayout contentLayout, @NonNull TextView deleteIcon,
-      @NonNull LinearLayout deleteLayout, @NonNull TextView tag, @NonNull TextView time,
-      @NonNull TextView title) {
+      @NonNull LinearLayout deleteLayout, @NonNull TextView locationText, @NonNull TextView tag,
+      @NonNull TextView time, @NonNull TextView title) {
     this.rootView = rootView;
     this.content = content;
     this.contentLayout = contentLayout;
     this.deleteIcon = deleteIcon;
     this.deleteLayout = deleteLayout;
+    this.locationText = locationText;
     this.tag = tag;
     this.time = time;
     this.title = title;
@@ -106,6 +110,12 @@ public final class ItemNoteBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.locationText;
+      TextView locationText = ViewBindings.findChildViewById(rootView, id);
+      if (locationText == null) {
+        break missingId;
+      }
+
       id = R.id.tag;
       TextView tag = ViewBindings.findChildViewById(rootView, id);
       if (tag == null) {
@@ -125,7 +135,7 @@ public final class ItemNoteBinding implements ViewBinding {
       }
 
       return new ItemNoteBinding((FrameLayout) rootView, content, contentLayout, deleteIcon,
-          deleteLayout, tag, time, title);
+          deleteLayout, locationText, tag, time, title);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

@@ -11,11 +11,12 @@ import com.example.notingapp.ui.CreateNoteActivity
 import java.text.DateFormat
 import kotlin.collections.ArrayList
 
+import com.google.android.gms.location.LocationServices // 🔥 ADD
+
 class NoteAdapter : RecyclerView.Adapter<NoteAdapter.NoteViewHolder>() {
 
     private var notes = ArrayList<Note>()
 
-    // 🔥 EVENT CALLBACK
     var onDeleteClick: ((Note) -> Unit)? = null
 
     fun submitList(list: List<Note>) {
@@ -49,6 +50,23 @@ class NoteAdapter : RecyclerView.Adapter<NoteAdapter.NoteViewHolder>() {
 
         holder.binding.time.text =
             DateFormat.getDateTimeInstance().format(note.lastModified)
+
+        // 🔥 BONUS: HIỂN THỊ LOCATION (nếu có TextView trong XML)
+        try {
+            val locationView = holder.binding.root.findViewById<android.widget.TextView>(
+                com.example.notingapp.R.id.locationText
+            )
+
+            if (note.locationName != null) {
+                holder.binding.locationText.text = "📍 ${note.locationName}"
+                holder.binding.locationText.visibility = android.view.View.VISIBLE
+            } else {
+                holder.binding.locationText.visibility = android.view.View.GONE
+            }
+
+        } catch (e: Exception) {
+            // nếu chưa có locationText thì bỏ qua
+        }
 
         val contentView = holder.binding.contentLayout
         val deleteLayout = holder.binding.deleteLayout
@@ -85,20 +103,26 @@ class NoteAdapter : RecyclerView.Adapter<NoteAdapter.NoteViewHolder>() {
             true
         }
 
-        // 🔥 GỬI EVENT LÊN FRAGMENT
         deleteLayout.setOnClickListener {
+
+            // 🔥 REMOVE GEOFENCE
+            val client = LocationServices.getGeofencingClient(holder.itemView.context)
+            client.removeGeofences(listOf(note.id.toString()))
+
             onDeleteClick?.invoke(note)
         }
 
+        // 🔥 FIX: click mở màn edit
         holder.itemView.setOnClickListener {
 
-            val intent = Intent(
-                holder.itemView.context,
-                CreateNoteActivity::class.java
-            )
+            val context = holder.itemView.context
 
-            intent.putExtra("noteId", note.id)
-            holder.itemView.context.startActivity(intent)
+            val intent = Intent(context, CreateNoteActivity::class.java).apply {
+                putExtra("noteId", note.id)
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) // 🔥 tránh crash context
+            }
+
+            context.startActivity(intent)
         }
     }
 }

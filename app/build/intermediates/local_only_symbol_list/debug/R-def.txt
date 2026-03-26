@@ -11,6 +11,7 @@ id deleteIcon
 id deleteLayout
 id italicBtn
 id locationBtn
+id locationText
 id map
 id noteRecycler
 id quoteAuthor
