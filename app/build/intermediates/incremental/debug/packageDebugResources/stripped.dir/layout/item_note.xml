@@ -3,6 +3,19 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
+    <!-- DELETE BUTTON -->
+    <TextView
+        android:id="@+id/deleteBtn"
+        android:text="✖"
+        android:textSize="18sp"
+        android:textColor="#FFFFFF"
+        android:background="#FF5252"
+        android:padding="6dp"
+        android:layout_gravity="end|top"
+        android:layout_margin="6dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
     <!-- DELETE BACKGROUND -->
     <LinearLayout
         android:id="@+id/deleteLayout"
@@ -30,13 +43,31 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <TextView
-            android:id="@+id/title"
-            android:textColor="#000000"
-            android:textStyle="bold"
-            android:textSize="18sp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+        <!-- 🔥 HEADER: TITLE + SHARE -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/title"
+                android:textColor="#000000"
+                android:textStyle="bold"
+                android:textSize="18sp"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"/>
+
+            <!-- 🔥 SHARE BUTTON -->
+            <ImageView
+                android:id="@+id/shareBtn"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@android:drawable/ic_menu_share"
+                android:contentDescription="Share"
+                android:padding="4dp"
+                android:background="?attr/selectableItemBackgroundBorderless"/>
+        </LinearLayout>
 
         <TextView
             android:id="@+id/content"
@@ -50,7 +81,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 
-        <!-- 🔥 NEW: LOCATION -->
+        <!-- 🔥 LOCATION -->
         <TextView
             android:id="@+id/locationText"
             android:layout_width="wrap_content"

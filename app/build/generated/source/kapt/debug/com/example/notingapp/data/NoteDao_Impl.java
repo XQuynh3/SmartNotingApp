@@ -634,6 +634,114 @@ public final class NoteDao_Impl implements NoteDao {
     });
   }
 
+  @Override
+  public Object findByTitleAndContent(final String title, final String content,
+      final Continuation<? super Note> $completion) {
+    final String _sql = "SELECT * FROM Note WHERE title = ? AND content = ? LIMIT 1";
+    final RoomSQLiteQuery _statement = RoomSQLiteQuery.acquire(_sql, 2);
+    int _argIndex = 1;
+    if (title == null) {
+      _statement.bindNull(_argIndex);
+    } else {
+      _statement.bindString(_argIndex, title);
+    }
+    _argIndex = 2;
+    if (content == null) {
+      _statement.bindNull(_argIndex);
+    } else {
+      _statement.bindString(_argIndex, content);
+    }
+    final CancellationSignal _cancellationSignal = DBUtil.createCancellationSignal();
+    return CoroutinesRoom.execute(__db, false, _cancellationSignal, new Callable<Note>() {
+      @Override
+      @Nullable
+      public Note call() throws Exception {
+        final Cursor _cursor = DBUtil.query(__db, _statement, false, null);
+        try {
+          final int _cursorIndexOfId = CursorUtil.getColumnIndexOrThrow(_cursor, "id");
+          final int _cursorIndexOfTitle = CursorUtil.getColumnIndexOrThrow(_cursor, "title");
+          final int _cursorIndexOfContent = CursorUtil.getColumnIndexOrThrow(_cursor, "content");
+          final int _cursorIndexOfTag = CursorUtil.getColumnIndexOrThrow(_cursor, "tag");
+          final int _cursorIndexOfColor = CursorUtil.getColumnIndexOrThrow(_cursor, "color");
+          final int _cursorIndexOfPinned = CursorUtil.getColumnIndexOrThrow(_cursor, "pinned");
+          final int _cursorIndexOfTextSize = CursorUtil.getColumnIndexOrThrow(_cursor, "textSize");
+          final int _cursorIndexOfBold = CursorUtil.getColumnIndexOrThrow(_cursor, "bold");
+          final int _cursorIndexOfItalic = CursorUtil.getColumnIndexOrThrow(_cursor, "italic");
+          final int _cursorIndexOfLastModified = CursorUtil.getColumnIndexOrThrow(_cursor, "lastModified");
+          final int _cursorIndexOfLatitude = CursorUtil.getColumnIndexOrThrow(_cursor, "latitude");
+          final int _cursorIndexOfLongitude = CursorUtil.getColumnIndexOrThrow(_cursor, "longitude");
+          final int _cursorIndexOfLocationName = CursorUtil.getColumnIndexOrThrow(_cursor, "locationName");
+          final Note _result;
+          if (_cursor.moveToFirst()) {
+            final int _tmpId;
+            _tmpId = _cursor.getInt(_cursorIndexOfId);
+            final String _tmpTitle;
+            if (_cursor.isNull(_cursorIndexOfTitle)) {
+              _tmpTitle = null;
+            } else {
+              _tmpTitle = _cursor.getString(_cursorIndexOfTitle);
+            }
+            final String _tmpContent;
+            if (_cursor.isNull(_cursorIndexOfContent)) {
+              _tmpContent = null;
+            } else {
+              _tmpContent = _cursor.getString(_cursorIndexOfContent);
+            }
+            final String _tmpTag;
+            if (_cursor.isNull(_cursorIndexOfTag)) {
+              _tmpTag = null;
+            } else {
+              _tmpTag = _cursor.getString(_cursorIndexOfTag);
+            }
+            final int _tmpColor;
+            _tmpColor = _cursor.getInt(_cursorIndexOfColor);
+            final boolean _tmpPinned;
+            final int _tmp;
+            _tmp = _cursor.getInt(_cursorIndexOfPinned);
+            _tmpPinned = _tmp != 0;
+            final float _tmpTextSize;
+            _tmpTextSize = _cursor.getFloat(_cursorIndexOfTextSize);
+            final boolean _tmpBold;
+            final int _tmp_1;
+            _tmp_1 = _cursor.getInt(_cursorIndexOfBold);
+            _tmpBold = _tmp_1 != 0;
+            final boolean _tmpItalic;
+            final int _tmp_2;
+            _tmp_2 = _cursor.getInt(_cursorIndexOfItalic);
+            _tmpItalic = _tmp_2 != 0;
+            final long _tmpLastModified;
+            _tmpLastModified = _cursor.getLong(_cursorIndexOfLastModified);
+            final Double _tmpLatitude;
+            if (_cursor.isNull(_cursorIndexOfLatitude)) {
+              _tmpLatitude = null;
+            } else {
+              _tmpLatitude = _cursor.getDouble(_cursorIndexOfLatitude);
+            }
+            final Double _tmpLongitude;
+            if (_cursor.isNull(_cursorIndexOfLongitude)) {
+              _tmpLongitude = null;
+            } else {
+              _tmpLongitude = _cursor.getDouble(_cursorIndexOfLongitude);
+            }
+            final String _tmpLocationName;
+            if (_cursor.isNull(_cursorIndexOfLocationName)) {
+              _tmpLocationName = null;
+            } else {
+              _tmpLocationName = _cursor.getString(_cursorIndexOfLocationName);
+            }
+            _result = new Note(_tmpId,_tmpTitle,_tmpContent,_tmpTag,_tmpColor,_tmpPinned,_tmpTextSize,_tmpBold,_tmpItalic,_tmpLastModified,_tmpLatitude,_tmpLongitude,_tmpLocationName);
+          } else {
+            _result = null;
+          }
+          return _result;
+        } finally {
+          _cursor.close();
+          _statement.release();
+        }
+      }
+    }, $completion);
+  }
+
   @NonNull
   public static List<Class<?>> getRequiredConverters() {
     return Collections.emptyList();

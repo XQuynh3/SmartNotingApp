@@ -29,6 +29,9 @@ public final class ActivityCreateNoteBinding implements ViewBinding {
   public final Button boldBtn;
 
   @NonNull
+  public final Button checkboxBtn;
+
+  @NonNull
   public final EditText contentInput;
 
   @NonNull
@@ -36,6 +39,9 @@ public final class ActivityCreateNoteBinding implements ViewBinding {
 
   @NonNull
   public final Button locationBtn;
+
+  @NonNull
+  public final Button removeLocationBtn;
 
   @NonNull
   public final Button saveBtn;
@@ -50,15 +56,18 @@ public final class ActivityCreateNoteBinding implements ViewBinding {
   public final EditText titleInput;
 
   private ActivityCreateNoteBinding(@NonNull ScrollView rootView, @NonNull Button addTagBtn,
-      @NonNull Button boldBtn, @NonNull EditText contentInput, @NonNull Button italicBtn,
-      @NonNull Button locationBtn, @NonNull Button saveBtn, @NonNull Spinner tagSpinner,
-      @NonNull SeekBar textSizeSeek, @NonNull EditText titleInput) {
+      @NonNull Button boldBtn, @NonNull Button checkboxBtn, @NonNull EditText contentInput,
+      @NonNull Button italicBtn, @NonNull Button locationBtn, @NonNull Button removeLocationBtn,
+      @NonNull Button saveBtn, @NonNull Spinner tagSpinner, @NonNull SeekBar textSizeSeek,
+      @NonNull EditText titleInput) {
     this.rootView = rootView;
     this.addTagBtn = addTagBtn;
     this.boldBtn = boldBtn;
+    this.checkboxBtn = checkboxBtn;
     this.contentInput = contentInput;
     this.italicBtn = italicBtn;
     this.locationBtn = locationBtn;
+    this.removeLocationBtn = removeLocationBtn;
     this.saveBtn = saveBtn;
     this.tagSpinner = tagSpinner;
     this.textSizeSeek = textSizeSeek;
@@ -104,6 +113,12 @@ public final class ActivityCreateNoteBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.checkboxBtn;
+      Button checkboxBtn = ViewBindings.findChildViewById(rootView, id);
+      if (checkboxBtn == null) {
+        break missingId;
+      }
+
       id = R.id.contentInput;
       EditText contentInput = ViewBindings.findChildViewById(rootView, id);
       if (contentInput == null) {
@@ -119,6 +134,12 @@ public final class ActivityCreateNoteBinding implements ViewBinding {
       id = R.id.locationBtn;
       Button locationBtn = ViewBindings.findChildViewById(rootView, id);
       if (locationBtn == null) {
+        break missingId;
+      }
+
+      id = R.id.removeLocationBtn;
+      Button removeLocationBtn = ViewBindings.findChildViewById(rootView, id);
+      if (removeLocationBtn == null) {
         break missingId;
       }
 
@@ -146,8 +167,9 @@ public final class ActivityCreateNoteBinding implements ViewBinding {
         break missingId;
       }
 
-      return new ActivityCreateNoteBinding((ScrollView) rootView, addTagBtn, boldBtn, contentInput,
-          italicBtn, locationBtn, saveBtn, tagSpinner, textSizeSeek, titleInput);
+      return new ActivityCreateNoteBinding((ScrollView) rootView, addTagBtn, boldBtn, checkboxBtn,
+          contentInput, italicBtn, locationBtn, removeLocationBtn, saveBtn, tagSpinner,
+          textSizeSeek, titleInput);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

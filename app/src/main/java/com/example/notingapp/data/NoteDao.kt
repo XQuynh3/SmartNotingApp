@@ -36,4 +36,8 @@ interface NoteDao {
         ORDER BY pinned DESC, lastModified DESC
     """)
     fun filterTag(tag: String): LiveData<List<Note>>
+
+    // 🔥 NEW: check trùng (QUAN TRỌNG)
+    @Query("SELECT * FROM Note WHERE title = :title AND content = :content LIMIT 1")
+    suspend fun findByTitleAndContent(title: String, content: String): Note?
 }

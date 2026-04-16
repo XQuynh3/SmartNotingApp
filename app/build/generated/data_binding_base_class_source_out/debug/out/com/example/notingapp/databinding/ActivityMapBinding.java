@@ -4,29 +4,53 @@ package com.example.notingapp.databinding;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.ListView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.viewbinding.ViewBinding;
+import androidx.viewbinding.ViewBindings;
 import com.example.notingapp.R;
 import java.lang.NullPointerException;
 import java.lang.Override;
+import java.lang.String;
 import org.osmdroid.views.MapView;
 
 public final class ActivityMapBinding implements ViewBinding {
   @NonNull
-  private final MapView rootView;
+  private final FrameLayout rootView;
+
+  @NonNull
+  public final Button confirmBtn;
+
+  @NonNull
+  public final Button currentLocationBtn;
 
   @NonNull
   public final MapView map;
 
-  private ActivityMapBinding(@NonNull MapView rootView, @NonNull MapView map) {
+  @NonNull
+  public final ListView resultList;
+
+  @NonNull
+  public final EditText searchLocation;
+
+  private ActivityMapBinding(@NonNull FrameLayout rootView, @NonNull Button confirmBtn,
+      @NonNull Button currentLocationBtn, @NonNull MapView map, @NonNull ListView resultList,
+      @NonNull EditText searchLocation) {
     this.rootView = rootView;
+    this.confirmBtn = confirmBtn;
+    this.currentLocationBtn = currentLocationBtn;
     this.map = map;
+    this.resultList = resultList;
+    this.searchLocation = searchLocation;
   }
 
   @Override
   @NonNull
-  public MapView getRoot() {
+  public FrameLayout getRoot() {
     return rootView;
   }
 
@@ -47,12 +71,44 @@ public final class ActivityMapBinding implements ViewBinding {
 
   @NonNull
   public static ActivityMapBinding bind(@NonNull View rootView) {
-    if (rootView == null) {
-      throw new NullPointerException("rootView");
+    // The body of this method is generated in a way you would not otherwise write.
+    // This is done to optimize the compiled bytecode for size and performance.
+    int id;
+    missingId: {
+      id = R.id.confirmBtn;
+      Button confirmBtn = ViewBindings.findChildViewById(rootView, id);
+      if (confirmBtn == null) {
+        break missingId;
+      }
+
+      id = R.id.currentLocationBtn;
+      Button currentLocationBtn = ViewBindings.findChildViewById(rootView, id);
+      if (currentLocationBtn == null) {
+        break missingId;
+      }
+
+      id = R.id.map;
+      MapView map = ViewBindings.findChildViewById(rootView, id);
+      if (map == null) {
+        break missingId;
+      }
+
+      id = R.id.resultList;
+      ListView resultList = ViewBindings.findChildViewById(rootView, id);
+      if (resultList == null) {
+        break missingId;
+      }
+
+      id = R.id.searchLocation;
+      EditText searchLocation = ViewBindings.findChildViewById(rootView, id);
+      if (searchLocation == null) {
+        break missingId;
+      }
+
+      return new ActivityMapBinding((FrameLayout) rootView, confirmBtn, currentLocationBtn, map,
+          resultList, searchLocation);
     }
-
-    MapView map = (MapView) rootView;
-
-    return new ActivityMapBinding((MapView) rootView, map);
+    String missingId = rootView.getResources().getResourceName(id);
+    throw new NullPointerException("Missing required view with ID: ".concat(missingId));
   }
 }

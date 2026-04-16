@@ -3,10 +3,14 @@ local
 id addNoteBtn
 id addTagBtn
 id boldBtn
+id checkboxBtn
+id confirmBtn
 id container
 id content
 id contentInput
 id contentLayout
+id currentLocationBtn
+id deleteBtn
 id deleteIcon
 id deleteLayout
 id italicBtn
@@ -17,8 +21,12 @@ id noteRecycler
 id quoteAuthor
 id quoteLayout
 id quoteText
+id removeLocationBtn
+id resultList
 id saveBtn
 id searchInput
+id searchLocation
+id shareBtn
 id tag
 id tagFilter
 id tagSpinner

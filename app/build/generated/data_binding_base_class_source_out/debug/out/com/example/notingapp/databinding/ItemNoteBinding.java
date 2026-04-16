@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
@@ -27,6 +28,9 @@ public final class ItemNoteBinding implements ViewBinding {
   public final LinearLayout contentLayout;
 
   @NonNull
+  public final TextView deleteBtn;
+
+  @NonNull
   public final TextView deleteIcon;
 
   @NonNull
@@ -34,6 +38,9 @@ public final class ItemNoteBinding implements ViewBinding {
 
   @NonNull
   public final TextView locationText;
+
+  @NonNull
+  public final ImageView shareBtn;
 
   @NonNull
   public final TextView tag;
@@ -45,15 +52,18 @@ public final class ItemNoteBinding implements ViewBinding {
   public final TextView title;
 
   private ItemNoteBinding(@NonNull FrameLayout rootView, @NonNull TextView content,
-      @NonNull LinearLayout contentLayout, @NonNull TextView deleteIcon,
-      @NonNull LinearLayout deleteLayout, @NonNull TextView locationText, @NonNull TextView tag,
+      @NonNull LinearLayout contentLayout, @NonNull TextView deleteBtn,
+      @NonNull TextView deleteIcon, @NonNull LinearLayout deleteLayout,
+      @NonNull TextView locationText, @NonNull ImageView shareBtn, @NonNull TextView tag,
       @NonNull TextView time, @NonNull TextView title) {
     this.rootView = rootView;
     this.content = content;
     this.contentLayout = contentLayout;
+    this.deleteBtn = deleteBtn;
     this.deleteIcon = deleteIcon;
     this.deleteLayout = deleteLayout;
     this.locationText = locationText;
+    this.shareBtn = shareBtn;
     this.tag = tag;
     this.time = time;
     this.title = title;
@@ -98,6 +108,12 @@ public final class ItemNoteBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.deleteBtn;
+      TextView deleteBtn = ViewBindings.findChildViewById(rootView, id);
+      if (deleteBtn == null) {
+        break missingId;
+      }
+
       id = R.id.deleteIcon;
       TextView deleteIcon = ViewBindings.findChildViewById(rootView, id);
       if (deleteIcon == null) {
@@ -113,6 +129,12 @@ public final class ItemNoteBinding implements ViewBinding {
       id = R.id.locationText;
       TextView locationText = ViewBindings.findChildViewById(rootView, id);
       if (locationText == null) {
+        break missingId;
+      }
+
+      id = R.id.shareBtn;
+      ImageView shareBtn = ViewBindings.findChildViewById(rootView, id);
+      if (shareBtn == null) {
         break missingId;
       }
 
@@ -134,8 +156,8 @@ public final class ItemNoteBinding implements ViewBinding {
         break missingId;
       }
 
-      return new ItemNoteBinding((FrameLayout) rootView, content, contentLayout, deleteIcon,
-          deleteLayout, locationText, tag, time, title);
+      return new ItemNoteBinding((FrameLayout) rootView, content, contentLayout, deleteBtn,
+          deleteIcon, deleteLayout, locationText, shareBtn, tag, time, title);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

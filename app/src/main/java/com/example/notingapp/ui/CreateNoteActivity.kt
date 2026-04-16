@@ -5,9 +5,10 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Typeface
-import android.os.Build
 import android.os.Bundle
 import android.widget.*
+import android.view.MotionEvent
+import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -31,6 +32,10 @@ class CreateNoteActivity : AppCompatActivity() {
     lateinit var addTagBtn: Button
     lateinit var locationBtn: Button
 
+    // 🔥 NEW
+    lateinit var checkboxBtn: Button
+    lateinit var removeLocationBtn: Button
+
     private val tagViewModel: TagViewModel by viewModels()
     private val noteViewModel: NoteViewModel by viewModels()
 
@@ -41,12 +46,11 @@ class CreateNoteActivity : AppCompatActivity() {
     var textSize = 16f
 
     private var noteId = -1
+    private var currentNote: Note? = null
 
     var latitude: Double? = null
     var longitude: Double? = null
     var locationName: String? = null
-
-    private var currentNote: Note? = null
 
     private var pendingGeofenceNote: Note? = null
 
@@ -65,11 +69,16 @@ class CreateNoteActivity : AppCompatActivity() {
         addTagBtn = findViewById(R.id.addTagBtn)
         locationBtn = findViewById(R.id.locationBtn)
 
+        checkboxBtn = findViewById(R.id.checkboxBtn)
+        removeLocationBtn = findViewById(R.id.removeLocationBtn)
+
         noteId = intent.getIntExtra("noteId", -1)
 
         setupTagSpinner()
         setupTextSize()
         setupStyleButtons()
+        setupChecklist()
+        setupRemoveLocation()
 
         locationBtn.setOnClickListener {
             val intent = Intent(this, MapActivity::class.java)
@@ -83,9 +92,87 @@ class CreateNoteActivity : AppCompatActivity() {
             true
         }
 
-        if (noteId != -1) loadNote()
+        if (noteId != -1) {
+            loadNoteForEdit(noteId)
+        }
 
         saveBtn.setOnClickListener { saveNote() }
+    }
+
+    // ✅ CHECKLIST
+    private fun setupChecklist() {
+
+        checkboxBtn.setOnClickListener {
+
+            val cursorPos = contentInput.selectionStart
+            val text = contentInput.text
+
+            if (cursorPos != 0 && text[cursorPos - 1].toString() != "\n") {
+                text.insert(cursorPos, "\n")
+            }
+
+            text.insert(contentInput.selectionStart, "☐ ")
+        }
+
+        contentInput.setOnTouchListener { v: View, event: MotionEvent ->
+
+            if (event.action == MotionEvent.ACTION_UP) {
+
+                val editText = v as EditText
+                val cursor = editText.selectionStart
+                val text = editText.text.toString()
+
+                val start = text.lastIndexOf('\n', cursor - 1) + 1
+                val end = text.indexOf('\n', cursor).let {
+                    if (it == -1) text.length else it
+                }
+
+                val line = text.substring(start, end)
+
+                if (line.startsWith("☐") || line.startsWith("☑")) {
+
+                    val newLine = if (line.startsWith("☐")) {
+                        line.replaceFirst("☐", "☑")
+                    } else {
+                        line.replaceFirst("☑", "☐")
+                    }
+
+                    editText.text.replace(start, end, newLine)
+                }
+            }
+
+            false
+        }
+    }
+
+    // ✅ REMOVE LOCATION
+    private fun setupRemoveLocation() {
+
+        removeLocationBtn.setOnClickListener {
+
+            if (latitude == null) return@setOnClickListener
+
+            AlertDialog.Builder(this)
+                .setTitle("Remove location?")
+                .setMessage("This will remove location reminder from this note.")
+                .setPositiveButton("Remove") { _, _ ->
+
+                    val client = LocationServices.getGeofencingClient(this)
+                    currentNote?.let {
+                        client.removeGeofences(listOf(it.id.toString()))
+                    }
+
+                    latitude = null
+                    longitude = null
+                    locationName = null
+
+                    Toast.makeText(this, "Location removed", Toast.LENGTH_SHORT).show()
+
+                    removeLocationBtn.visibility = View.GONE
+                }
+                .setNegativeButton("Cancel", null)
+                .show()
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -97,6 +184,8 @@ class CreateNoteActivity : AppCompatActivity() {
             latitude = data?.getDoubleExtra("lat", 0.0)
             longitude = data?.getDoubleExtra("lng", 0.0)
             locationName = data?.getStringExtra("locationName")
+
+            removeLocationBtn.visibility = View.VISIBLE
 
             Toast.makeText(this, locationName, Toast.LENGTH_SHORT).show()
         }
@@ -117,7 +206,7 @@ class CreateNoteActivity : AppCompatActivity() {
 
             tagSpinner.onItemSelectedListener =
                 object : AdapterView.OnItemSelectedListener {
-                    override fun onItemSelected(parent: AdapterView<*>?, view: android.view.View?, position: Int, id: Long) {
+                    override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                         selectedPosition = position
                         selectedTag = tagNames[position]
                     }
@@ -154,9 +243,10 @@ class CreateNoteActivity : AppCompatActivity() {
         italicBtn.setOnClickListener { contentInput.setTypeface(null, Typeface.ITALIC) }
     }
 
-    private fun loadNote() {
+    private fun loadNoteForEdit(id: Int) {
+
         noteViewModel.notes.observe(this) { notes ->
-            val note = notes.find { it.id == noteId } ?: return@observe
+            val note = notes.find { it.id == id } ?: return@observe
 
             currentNote = note
 
@@ -170,6 +260,13 @@ class CreateNoteActivity : AppCompatActivity() {
             latitude = note.latitude
             longitude = note.longitude
             locationName = note.locationName
+
+            // 🔥 show button nếu có location
+            if (latitude != null) {
+                removeLocationBtn.visibility = View.VISIBLE
+            } else {
+                removeLocationBtn.visibility = View.GONE
+            }
         }
     }
 
@@ -191,7 +288,6 @@ class CreateNoteActivity : AppCompatActivity() {
 
     private fun deleteCurrentTag() {}
 
-    // 🔥 chỉ cần fine location
     private fun hasLocationPermission(): Boolean {
         return ActivityCompat.checkSelfPermission(
             this,
@@ -261,49 +357,50 @@ class CreateNoteActivity : AppCompatActivity() {
         }
     }
 
-    // 🔥 FIX LOGIC SAVE
     private fun saveNote() {
-
-        val note = Note(
-            id = if (noteId == -1) 0 else noteId,
-            title = titleInput.text.toString(),
-            content = contentInput.text.toString(),
-            tag = selectedTag,
-            textSize = textSize,
-            latitude = latitude,
-            longitude = longitude,
-            locationName = locationName
-        )
 
         val isEdit = noteId != -1
 
-        // ✅ CASE 1: không có location
+        val note = if (isEdit) {
+            currentNote!!.copy(
+                title = titleInput.text.toString(),
+                content = contentInput.text.toString(),
+                tag = selectedTag,
+                textSize = textSize,
+                latitude = latitude,
+                longitude = longitude,
+                locationName = locationName
+            )
+        } else {
+            Note(
+                title = titleInput.text.toString(),
+                content = contentInput.text.toString(),
+                tag = selectedTag,
+                textSize = textSize,
+                latitude = latitude,
+                longitude = longitude,
+                locationName = locationName
+            )
+        }
+
         if (latitude == null || longitude == null) {
 
-            if (isEdit) {
-                noteViewModel.update(note)
-            } else {
-                noteViewModel.insert(note)
-            }
+            if (isEdit) noteViewModel.update(note)
+            else noteViewModel.insert(note)
 
             Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show()
             finish()
             return
         }
 
-        // ✅ CASE 2: có location nhưng chưa có permission
         if (!hasLocationPermission()) {
             pendingGeofenceNote = note
             requestLocationPermission()
             return
         }
 
-        // ✅ CASE 3: có location + có permission
-        if (isEdit) {
-            noteViewModel.update(note)
-        } else {
-            noteViewModel.insert(note)
-        }
+        if (isEdit) noteViewModel.update(note)
+        else noteViewModel.insert(note)
 
         addGeofence(note)
 
@@ -328,11 +425,8 @@ class CreateNoteActivity : AppCompatActivity() {
 
                     val isEdit = note.id != 0
 
-                    if (isEdit) {
-                        noteViewModel.update(note)
-                    } else {
-                        noteViewModel.insert(note)
-                    }
+                    if (isEdit) noteViewModel.update(note)
+                    else noteViewModel.insert(note)
 
                     addGeofence(note)
 
@@ -341,7 +435,6 @@ class CreateNoteActivity : AppCompatActivity() {
                 }
 
             } else {
-                // 🔥 DENY → save KHÔNG location
                 pendingGeofenceNote?.let { note ->
 
                     val noteWithoutLocation = note.copy(
@@ -352,11 +445,8 @@ class CreateNoteActivity : AppCompatActivity() {
 
                     val isEdit = noteWithoutLocation.id != 0
 
-                    if (isEdit) {
-                        noteViewModel.update(noteWithoutLocation)
-                    } else {
-                        noteViewModel.insert(noteWithoutLocation)
-                    }
+                    if (isEdit) noteViewModel.update(noteWithoutLocation)
+                    else noteViewModel.insert(noteWithoutLocation)
 
                     Toast.makeText(this, "Saved without location", Toast.LENGTH_SHORT).show()
                     finish()

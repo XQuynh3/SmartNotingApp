@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.example.notingapp-mergeDebugResources-45:/values-it/values-it.xml",
+            "outputFile": "com.example.notingapp-mergeDebugResources-48:/values-it/values-it.xml",
             "map": [
                 {
                     "source": "C:\\Users\\Cun Mo BA\\.gradle\\caches\\transforms-3\\bf21ee81893fe5e9ea2f5eace9edbcad\\transformed\\osmdroid-android-6.1.16\\res\\values-it\\values-it.xml",

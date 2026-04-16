@@ -52,6 +52,8 @@ class HomeFragment : Fragment() {
         setupSearch()
         observeNotes()
 
+        viewModel.syncFromServer()
+
         binding.addNoteBtn.setOnClickListener {
             startActivity(Intent(requireContext(), CreateNoteActivity::class.java))
         }

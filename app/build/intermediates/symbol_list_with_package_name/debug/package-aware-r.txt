@@ -1264,7 +1264,11 @@ attr yearTodayStyle
 attr zOrderOnTop
 bool abc_action_bar_embed_tabs
 bool abc_config_actionMenuItemAllCaps
+bool enable_system_alarm_service_default
+bool enable_system_foreground_service_default
+bool enable_system_job_service_default
 bool mtrl_btn_textappearance_all_caps
+bool workmanager_test_configuration
 color abc_background_cache_hint_selector_material_dark
 color abc_background_cache_hint_selector_material_light
 color abc_btn_colored_borderless_text_material
@@ -3183,6 +3187,7 @@ id center_vertical
 id chain
 id chains
 id checkbox
+id checkboxBtn
 id checked
 id chronometer
 id circle_center
@@ -3192,6 +3197,7 @@ id clip_vertical
 id clockwise
 id collapseActionView
 id compress
+id confirmBtn
 id confirm_button
 id container
 id content
@@ -3203,6 +3209,7 @@ id coordinator
 id cos
 id counterclockwise
 id cradle
+id currentLocationBtn
 id custom
 id customPanel
 id cut
@@ -3212,6 +3219,7 @@ id decelerate
 id decelerateAndComplete
 id decor_content_parent
 id default_activity_button
+id deleteBtn
 id deleteIcon
 id deleteLayout
 id deltaRelative
@@ -3426,7 +3434,9 @@ id quoteText
 id radio
 id ratio
 id rectangles
+id removeLocationBtn
 id report_drawn
+id resultList
 id reverseSawtooth
 id right
 id rightToLeft
@@ -3447,6 +3457,7 @@ id scrollIndicatorUp
 id scrollView
 id scrollable
 id searchInput
+id searchLocation
 id search_badge
 id search_bar
 id search_button
@@ -3460,6 +3471,7 @@ id search_voice_btn
 id select_dialog_listview
 id selected
 id selection_type
+id shareBtn
 id shortcut
 id showCustom
 id showHome

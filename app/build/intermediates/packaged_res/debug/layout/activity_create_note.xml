@@ -36,6 +36,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 
+        <!-- TOOLBAR -->
         <LinearLayout
             android:orientation="horizontal"
             android:layout_marginTop="10dp"
@@ -54,6 +55,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
 
+            <Button
+                android:id="@+id/checkboxBtn"
+                android:text="☐"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
         </LinearLayout>
 
         <SeekBar
@@ -75,6 +81,14 @@
             android:text="Set Location"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
+
+        <!-- 🔥 NEW: REMOVE LOCATION -->
+        <Button
+            android:id="@+id/removeLocationBtn"
+            android:text="Remove Location"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"/>
 
     </LinearLayout>
 
